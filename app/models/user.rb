@@ -12,7 +12,7 @@ class User
   field :t, as: :oauth_token
   field :e, as: :oauth_expires_at
 
-  has_many :q, class_name: Question, as: :questions, autosave: true
+  has_many :questions, dependent: :destroy, autosave: true
 
   index({ location:"2d" }, { min: -200, max: 200, background: true })
   index({ age:1 }, { background: true })
@@ -40,7 +40,8 @@ class User
         username: self.username,
         age: self.age,
         location: self.location,
-        last_activity: self.last_activity
+        last_activity: self.last_activity,
+        gender: self.gender,
     }
   end
 
@@ -50,6 +51,6 @@ class User
       yes += question.options[:yes]
       no += question.options[:no]
     end
-    ratio = yes.to_i/no.to_i
+    ratio = (yes.to_i/no.to_i).round(2)
   end
 end

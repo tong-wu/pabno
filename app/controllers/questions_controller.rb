@@ -5,6 +5,7 @@ class QuestionsController < ApplicationController
 
   def index
     #todo: show how many? lots of logic to write in model for this action
+    render json: {status: "Creating..."}, status: 200
   end
 
   def show

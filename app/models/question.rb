@@ -6,7 +6,7 @@ class Question
   field :o, as: :options, type: Hash
   field :i, as: :image, type: String
 
-  belongs_to :user, dependant: destroy, index:true
+  belongs_to :user, index:true
 
   def ask(params)
     #todo: error handling
@@ -35,6 +35,8 @@ class Question
 
     ratio = (yes.to_i/no.to_i)
   end
+
+
 
   def store_image(image)
     #todo: s3 for store and lambda to resize
