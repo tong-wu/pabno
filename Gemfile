@@ -44,7 +44,6 @@ group :development, :test do
   gem 'bson_ext'
 
   #auth gems
-  gem 'devise'
   gem 'omniauth'
   gem 'omniauth-facebook'
 end

@@ -1,4 +1,5 @@
 class QuestionsController < ApplicationController
+  before_action :check_login, only: [:vote, :create]
 
   before_action :find_question, only: [:show, :vote]
 
