@@ -12,4 +12,5 @@ Rails.application.routes.draw do
 
   resources :sessions, only: [:create, :destroy]
   resources :questions, only: [:index, :show, :create,]
+
 end

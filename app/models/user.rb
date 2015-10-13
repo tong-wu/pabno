@@ -31,10 +31,6 @@ class User
     end
   end
 
-  def update
-
-  end
-
   def info
     info = {
         username: self.username,
