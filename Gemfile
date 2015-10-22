@@ -30,9 +30,12 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
-
+#Mongodb for users and questions
 gem 'mongoid', github: 'mongoid/mongoid'
 gem 'bson_ext'
+
+#Cassandra for vote data
+gem 'cequel'
 
 #auth gems
 gem 'devise'

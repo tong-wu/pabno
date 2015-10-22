@@ -60,7 +60,7 @@ class Question
       REDIS_VOTES.set("YES:#{self.id}", 1)
       #todo: resque-scheduler
     end
-    #todo: insert into cassandra
+    #todo: insert into dynamo
   end
 
   def vote_no
@@ -70,7 +70,7 @@ class Question
       REDIS_VOTES.set("NO:#{self.id}", 1)
       #todo: resque-scheduler
     end
-    #todo: insert into cassandra
+    #todo: insert into dynamo
   end
 
   # This one only saves the count in mongodb. No need to batch the cassandra inserts
@@ -89,6 +89,24 @@ class Question
     if save
       #todo: not sure how to handle this yet. Data could be lost between redis key delete and last counted that we stored.
       #Probably not a big deal and we can just deal with the 1-2 lost votes.
+    end
+  end
+
+  def self.find_from_cache(id)
+    if REDIS_QUESTIONS.get("q-data:#{id}") == nil
+      question = Question.find(id.to_i)
+      REDIS_QUESTIONS.set("q-data:#{id}", question.to_json)
+      REDIS_QUESTIONS.expire("q-data:#{id}", 120)
+    end
+
+    REDIS_QUESTIONS.get("q-data:#{id}")
+  end
+
+  def self.top_list(start, stop)
+    top_questions = REDIS_QUESTIONS_RANK.zrevrange("top", start, stop)
+    top_array = Array.new
+    top_questions.each do |q|
+      top_array << Question.find_from_cache(q)
     end
   end
 end

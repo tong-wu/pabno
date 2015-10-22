@@ -4,8 +4,8 @@ class QuestionsController < ApplicationController
   before_action :find_question, only: [:show, :vote]
 
   def index
-    #todo: show how many? lots of logic to write in model for this action
-    render json: {status: "Creating..."}, status: 200
+    #todo: show how many? lots of logic to write in model for this action. For now, ranked based on activity
+    render json: @questions, status: 200
   end
 
   def show
@@ -19,9 +19,11 @@ class QuestionsController < ApplicationController
 
   def vote
     if params[:vote] == 'yes'
-      render json: { success: @questions.yes }, status:200
+      @current_user.cast_vote(@question.id, 1)
+      render json: { success: @question.yes }, status:200
     elsif params[:vote] == 'no'
-      render json: { success: @questions.no }, status:200
+      @current_user.cast_vote(@question.id, 0)
+      render json: { success: @question.no }, status:200
     else
       render json: { success: 'Invalid vote option #{params[:vote]}' }, status:400
     end
@@ -30,6 +32,13 @@ class QuestionsController < ApplicationController
   private
   def find_question
     @question = Question.find(params[:id])
+  end
+
+  def find_questions
+    page = headers[:page].nil? ? 0 : headers[:page].to_i
+    start = (page - 1) * 10
+    stop = page * 10
+    @questions = Question.top_list(start, stop)
   end
 
   def question_create_params
