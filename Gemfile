@@ -34,9 +34,6 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'mongoid', github: 'mongoid/mongoid'
 gem 'bson_ext'
 
-#Cassandra for vote data
-gem 'cequel'
-
 #auth gems
 gem 'devise'
 gem 'omniauth'

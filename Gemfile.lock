@@ -54,11 +54,6 @@ GEM
     bson_ext (1.5.1)
     builder (3.2.2)
     byebug (6.0.2)
-    cassandra-driver (2.1.5)
-      ione (~> 1.2)
-    cequel (1.7.0)
-      activemodel (~> 4.0)
-      cassandra-driver (~> 2.0)
     coffee-rails (4.1.0)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0, < 5.0)
@@ -84,7 +79,6 @@ GEM
       activesupport (>= 4.1.0)
     hashie (3.4.2)
     i18n (0.7.0)
-    ione (1.2.1)
     jbuilder (2.3.1)
       activesupport (>= 3.0.0, < 5)
       multi_json (~> 1.2)
@@ -196,7 +190,6 @@ PLATFORMS
 DEPENDENCIES
   bson_ext
   byebug
-  cequel
   coffee-rails (~> 4.1.0)
   devise
   figaro
