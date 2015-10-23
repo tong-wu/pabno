@@ -12,6 +12,10 @@ class QuestionsController < ApplicationController
     render json: @question, status: 200
   end
 
+  def friends_top
+    #todo: this calculation should happen when user logs in. Use resque to run in bg
+  end
+
   def create
     @question = Question.new
     @question.ask(question_create_params)
@@ -44,7 +48,7 @@ class QuestionsController < ApplicationController
   def question_create_params
     params.require(:question).permit(
         :text,
-        :image
+        # :image
     )
   end
 end

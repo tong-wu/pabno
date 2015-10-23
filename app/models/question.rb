@@ -2,6 +2,8 @@ class Question
   include Mongoid::Document
   store_in collection: "questions"
 
+  include AwsHelper
+
   field :t, as: :text, type: String
   field :o, as: :options, type: Hash
   field :i, as: :image, type: String
@@ -40,7 +42,7 @@ class Question
 
   def store_image(image)
     #todo: s3 for store and lambda to resize
-    "todo"
+    "None"
   end
 
   def yes
@@ -53,24 +55,24 @@ class Question
 
   # Note that these yes/no defs store votes in redis for storage in time intervals.
   # The number stored in redis is the number of NEW yes/no votes to be recorded
-  def vote_yes
+  def vote_yes(user_id)
     if REDIS_VOTES.get("YES:#{self.id}")
       REDIS_VOTES.incr("YES:#{self.id}")
     else
       REDIS_VOTES.set("YES:#{self.id}", 1)
       #todo: resque-scheduler
     end
-    #todo: insert into dynamo
+    aws_send_vote(user_id, 1)
   end
 
-  def vote_no
+  def vote_no(user_id)
     if REDIS_VOTES.get("NO:#{self.id}")
       REDIS_VOTES.incr("NO:#{self.id}")
     else
       REDIS_VOTES.set("NO:#{self.id}", 1)
       #todo: resque-scheduler
     end
-    #todo: insert into dynamo
+    aws_send_vote(user_id, 0)
   end
 
   # This one only saves the count in mongodb. No need to batch the cassandra inserts

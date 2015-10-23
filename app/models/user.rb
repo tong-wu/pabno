@@ -59,13 +59,16 @@ class User
     if votes.length <= 0
       votes = user.get_votes_history
     end
-    if votes.include? question_id
-      #todo: remove old vote from cache and add this one
-    else
-      #todo: add the vote to cache for saving later
+    if !votes.include? question_id
+      REDIS_USER_VOTES.sadd("user-votes:#{self.uid}", question_id.to_s)
+      REDIS_QUESTIONS_RANK.zincrby('top', 10, question_id.to_s)
     end
-    REDIS_QUESTIONS_RANK.zincrby('top', 10, question_id.to_s)
 
+    if vote == 1
+      Question.find(question_id).vote_yes(self.id)
+    elsif vote == 0
+      Question.find(question_id).vote_no(self.id)
+    end
   end
 
   def add_friend(friend_id)
