@@ -1,12 +1,12 @@
 module AwsHelper
-  def aws_send_yes(user_id, vote_val)
+  def aws_send_vote(user_id, vote_val, question_id)
     response = AWS_DYNAMO.batch_write_item({
                                     request_items:{
-                                        "question_votes_data" => [
+                                        "question_votes_data-dev" => [
                                             {
                                                 put_request: {
                                                     item: {
-                                                        "question_id" => self.id,
+                                                        "question_id" => question_id,
                                                         "user_id" => user_id,
                                                         "voted" => vote_val.to_s,
                                                         "timestamp" => Time.now.to_i.to_s
@@ -14,10 +14,15 @@ module AwsHelper
                                                 }
                                             }
                                         ],
-                                        "user_votes_data" => [
+                                        "user_votes_data-dev" => [
                                             {
                                                 put_request: {
-                                                    item: aws_userdata(user_id)
+                                                    item: {
+                                                        "user_id" => user_id,
+                                                        "timestamp" => Time.now.to_i.to_s,
+                                                        "question_id" => question_id,
+                                                        "voted" => vote_val.to_s
+                                                    }
                                                 }
                                             }
                                         ]

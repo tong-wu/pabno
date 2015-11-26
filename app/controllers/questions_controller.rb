@@ -2,6 +2,7 @@ class QuestionsController < ApplicationController
   before_action :check_login, only: [:vote, :create]
 
   before_action :find_question, only: [:show, :vote]
+  before_action :find_questions, only: [:index]
 
   def index
     #todo: show how many? lots of logic to write in model for this action. For now, ranked based on activity
@@ -39,7 +40,7 @@ class QuestionsController < ApplicationController
   end
 
   def find_questions
-    page = headers[:page].nil? ? 0 : headers[:page].to_i
+    page = headers[:page].nil? ? 1 : headers[:page].to_i
     start = (page - 1) * 10
     stop = page * 10
     @questions = Question.top_list(start, stop)

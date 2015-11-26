@@ -56,8 +56,8 @@ class User
   #While it does reduce upfront cost, might be something better left for the first update. First release won't get too many users
   def cast_vote(question_id, vote)
     votes = REDIS_USER_VOTES.smembers("user-votes:#{self.uid}")
-    if votes.length <= 0
-      votes = user.get_votes_history
+    if votes.nil?
+      votes = self.get_votes_history
     end
     if !votes.include? question_id
       REDIS_USER_VOTES.sadd("user-votes:#{self.uid}", question_id.to_s)
@@ -65,15 +65,35 @@ class User
     end
 
     if vote == 1
-      Question.find(question_id).vote_yes(self.id)
+      Question.find(question_id).vote(self.id, 1)
     elsif vote == 0
-      Question.find(question_id).vote_no(self.id)
+      Question.find(question_id).vote(self.id, 0)
     end
   end
 
   def add_friend(friend_id)
     friend = User.find(friend_id)
-    self.friends << friend
+    self.friends << friend.to_json
     save!
+  end
+
+  def get_votes_history
+    response = Array.new
+    loop do
+      resp = AWS_DYNAMO.query({
+                                  table_name: AWS_DYNAMO_VOTES_BY_USER_TBL,
+                                  limit: 1000,
+                                  scan_index_forward: "false",
+                                  key_conditions: {
+                                      "user_id" => {
+                                          attribute_value_list: [self.id],
+                                          comparison_operator: "EQ"
+                                      },
+                                  }
+                              })
+      response << resp
+      break if resp.count < 1
+    end
+    response
   end
 end
