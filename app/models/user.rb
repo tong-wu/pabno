@@ -21,6 +21,8 @@ class User
   index({ username:1 }, { unique:true, background:true })
   index({ uid:1 }, { unique:true, background:true })
 
+  enumerize :account_status, in: [:active, :disabled, :restricted], default: :active
+
   def self.from_omniauth(auth)
     where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
       user.provider = auth.provider
@@ -30,7 +32,7 @@ class User
       user.location = auth.location
       user.oauth_token = auth.credentials.token
       user.oauth_expires_at = Time.at(auth.credentials.expires_at)
-      user.account_status = AccountStatus::ACTIVE
+      user.account_status = 'active'
       user.save!
     end
   end
@@ -46,12 +48,12 @@ class User
   end
 
   def disable_account
-    self.account_status = AccountStatus::DISABLED
+    self.account_status = 'disabled'
     self.save!
   end
 
   def limit_account
-    self.account_status = AccountStatus::RESTRICTED
+    self.account_status = 'restricted'
     self.save!
   end
 
