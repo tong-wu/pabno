@@ -11,6 +11,7 @@ class User
   field :d, as: :device_tokens, type: Array
   field :t, as: :oauth_token
   field :e, as: :oauth_expires_at
+  field :s, as: :account_status
 
   has_many :questions, dependent: :destroy, autosave: true
   has_and_belongs_to_many :friends, class_name: 'User'
@@ -29,6 +30,7 @@ class User
       user.location = auth.location
       user.oauth_token = auth.credentials.token
       user.oauth_expires_at = Time.at(auth.credentials.expires_at)
+      user.account_status = AccountStatus::ACTIVE
       user.save!
     end
   end
@@ -41,6 +43,16 @@ class User
         last_activity: self.last_activity,
         gender: self.gender,
     }
+  end
+
+  def disable_account
+    self.account_status = AccountStatus::DISABLED
+    self.save!
+  end
+
+  def limit_account
+    self.account_status = AccountStatus::RESTRICTED
+    self.save!
   end
 
   def yes_no_ratio

@@ -3,12 +3,12 @@ class UsersController < ApplicationController
     render json: @user, status: 200
   end
 
-  def create
-    #todo: facebook?
-  end
-
   def disable
-    #todo: do we need?
+    if @user.disable_account
+      render json: @user, status: 200
+    else
+      render json: { error: "Account could not be disabled"}
+    end
   end
 
   private
