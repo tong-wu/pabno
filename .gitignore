@@ -44,7 +44,7 @@ bower.json
 /tmp
 
 .vagrant/
-.idea
+.idea/
 
 # Ignore application configuration
 /config/application.yml
