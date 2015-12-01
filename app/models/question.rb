@@ -49,7 +49,7 @@ class Question
 
   def self.find_from_cache(id)
     if REDIS_QUESTIONS.get("q-data:#{id}") == nil
-      question = Question.find(id.to_i)
+      question = Question.find(id)
       REDIS_QUESTIONS.set("q-data:#{id}", question.to_json)
       REDIS_QUESTIONS.expire("q-data:#{id}", 60)
     end
@@ -91,21 +91,21 @@ class Question
     aws_send_vote(user_id, 1, self.id)
   end
 
-  # This one only saves the count in mongodb.
-  def save_redis_votes
-    yes = REDIS_VOTES.get("YES:#{self.id}")
-    if yes
-      self.options[:yes] += yes.to_i
-    end
-
-    no = REDIS_VOTES.get("NO:#{self.id}")
-    if no
-      self.options[:no] += no.to_i
-    end
-
-    if save
-      #todo: not sure how to handle this yet. Data could be lost between redis key delete and last counted that we stored.
-      #Probably not a big deal and we can just deal with the 1-2 lost votes.
-    end
-  end
+  # # This one only saves the count in mongodb.
+  # def save_redis_votes
+  #   yes = REDIS_VOTES.get("YES:#{self.id}")
+  #   if yes
+  #     self.options[:yes] += yes.to_i
+  #   end
+  #
+  #   no = REDIS_VOTES.get("NO:#{self.id}")
+  #   if no
+  #     self.options[:no] += no.to_i
+  #   end
+  #
+  #   if save
+  #     #todo: not sure how to handle this yet. Data could be lost between redis key delete and last counted that we stored.
+  #     #Probably not a big deal and we can just deal with the 1-2 lost votes.
+  #   end
+  # end
 end

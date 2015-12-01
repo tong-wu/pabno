@@ -1,5 +1,6 @@
 class User
   include Mongoid::Document
+  extend Enumerize
 
   field :uid
   field :u, as: :username, type: String
@@ -63,6 +64,9 @@ class User
       yes += question.options[:yes]
       no += question.options[:no]
     end
+
+    no = no.to_i == 0 ? 1 : no.to_i
+
     ratio = (yes.to_i/no.to_i).round(2)
   end
 
