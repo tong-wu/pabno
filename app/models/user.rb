@@ -25,6 +25,7 @@ class User
   enumerize :account_status, in: [:active, :disabled, :restricted], default: :active
 
   def self.from_omniauth(auth)
+    #todo: Check that the token actually matches the user
     where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
       user.provider = auth.provider
       user.uid = auth.uid
@@ -33,7 +34,7 @@ class User
       user.location = auth.location
       user.oauth_token = auth.credentials.token
       user.oauth_expires_at = Time.at(auth.credentials.expires_at)
-      user.account_status = 'active'
+      user.account_status = user.account_status.nil? ? 'active' : user.account_status
       user.save!
     end
   end

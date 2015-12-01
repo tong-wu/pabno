@@ -5,12 +5,12 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   def current_user
-    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+    @current_user ||= User.where(:oauth_token => REDIS_LOGIN.get("token:#{headers["Access-Token"]}")) if headers["Access-Token"]
   end
 
   def check_login
     if !@current_user
-      redirect_to '/login' , status: 200
+      render json: { status: "Unauthorized" } , status: 401
     end
   end
 end
