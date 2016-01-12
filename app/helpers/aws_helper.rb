@@ -2,7 +2,7 @@ module AwsHelper
   def aws_send_vote(user_id, vote_val, question_id)
     response = AWS_DYNAMO.batch_write_item({
                                     request_items:{
-                                        "question_votes_data-dev" => [
+                                        AWS_DYNAMO_VOTES_BY_QUESTION_TBL => [
                                             {
                                                 put_request: {
                                                     item: {
@@ -14,7 +14,7 @@ module AwsHelper
                                                 }
                                             }
                                         ],
-                                        "user_votes_data-dev" => [
+                                        AWS_DYNAMO_VOTES_BY_USER_TBL => [
                                             {
                                                 put_request: {
                                                     item: {

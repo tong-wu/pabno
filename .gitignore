@@ -44,10 +44,14 @@ bower.json
 /tmp
 
 .vagrant/
-.idea
+
 
 # Ignore application configuration
 /config/application.yml
 
 
 /redis-stable
+
+.byebug_history
+.idea/
+

@@ -6,9 +6,10 @@ Rails.application.routes.draw do
   root 'questions#index'
 
   get 'auth/:provider/callback', to: 'sessions#create'
-  get 'auth/failure', to: redirect('/')
   get 'signout', to: 'sessions#destroy', as: 'signout'
-  get 'login', to: 'sessions#login'
+
+  put 'questions/vote/:vote', to: 'questions#vote'
+
 
   resources :sessions, only: [:create, :destroy]
   resources :questions, only: [:index, :show, :create,]
