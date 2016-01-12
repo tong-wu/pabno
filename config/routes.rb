@@ -8,6 +8,9 @@ Rails.application.routes.draw do
   get 'auth/:provider/callback', to: 'sessions#create'
   get 'signout', to: 'sessions#destroy', as: 'signout'
 
+  put 'questions/vote/:vote', to: 'questions#vote'
+
+
   resources :sessions, only: [:create, :destroy]
   resources :questions, only: [:index, :show, :create,]
 

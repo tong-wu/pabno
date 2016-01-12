@@ -1,8 +1,12 @@
 class UsersController < ApplicationController
-  before_action :get_user, only: [:show, :disable]
+  before_action :get_user, only: [:show, :disable, :questions]
 
   def show
     render json: @user, status: 200
+  end
+
+  def questions
+    render json: @user.questions, status: 200
   end
 
   def disable

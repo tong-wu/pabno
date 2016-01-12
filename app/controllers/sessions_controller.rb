@@ -1,16 +1,14 @@
 class SessionsController < ApplicationController
   def create
-    @user = User.from_omniauth(env["omniauth.auth"])
+    @user = User.from_token(header['token'])
     if @user
-      access_token = generate_access_token
-      REDIS_LOGIN.set("token:#{access_token}", @user.oauth_token)
-      REDIS_LOGIN.expireat("token:#{access_token}", 1.week.from_now.to_i)
-      render json: { token: access_token }, status: 200
+      render json: { status: "success" }, status: 200
     else
       render json: { error: "Sorry, could not authorize user" }, status: 401
     end
   end
 
+  #todo: Lol this definitely doesn't work right now
   def destroy
     destroy = REDIS_LOGIN.del("token:#{headers["Access-Token"]}")
     if destroy == 1

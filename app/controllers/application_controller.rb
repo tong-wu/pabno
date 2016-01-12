@@ -4,12 +4,14 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   helper_method :current_user
 
+  before_action :current_user, only: [:check_login]
+
   def current_user
-    @current_user ||= User.where(:oauth_token => REDIS_LOGIN.get("token:#{headers["Access-Token"]}")) if headers["Access-Token"]
+    @current_user ||= User.where(:oauth_token => REDIS_LOGIN.get("token:#{headers["Access-Token"]}")).first if headers["Access-Token"]
   end
 
   def check_login
-    if !@current_user
+    if !@current_user || @current_user.nil?
       render json: { status: "Unauthorized" } , status: 401
     end
   end
