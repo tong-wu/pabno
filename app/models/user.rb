@@ -74,13 +74,16 @@ class User
     ratio = (yes.to_i/no.to_i).round(2)
   end
 
-  #todo: Not sure if we really want to spend the extra time here to handle failed votes
-  #Might be something better left for the first update... just show all votes as success for now?
-  def cast_vote(question_id, vote)
+  #todo: move check_if_can_vote to a service probably better than a concern since not reusing this code elsewhere
+  #Check if a user has already voted on the question_id
+  def check_if_can_vote(question_id)
     votes = REDIS_USER_VOTES.smembers("user-votes:#{uid}")
     if votes.nil?
+      #get user's voting history
       votes = get_votes_history
     end
+
+    #if a user hasn't voted this before, increase the ranking and add the item to the user-votes redis array
     if !votes.include? question_id.to_i
       REDIS_USER_VOTES.sadd("user-votes:#{uid}", question_id.to_i)
       if REDIS_QUESTIONS_RANK.zscore('top', question_id.to_i)
@@ -88,40 +91,37 @@ class User
       else
         REDIS_QUESTIONS_RANK.zadd('top', Question.find(question_id.to_i).ranking + 10, question_id.to_i)
       end
+      true
+    else
+      false
     end
+  end
 
-    if vote == 1
-      Question.find(question_id).vote(id, 1)
-    elsif vote == 0
-      Question.find(question_id).vote(id, 0)
+  #todo: move this to a concern. We will reuse this for anything that can have a vote history
+  def get_votes_history
+    response = Array.new
+    resp = AWS_DYNAMO.query({
+                                table_name: AWS_DYNAMO_VOTES_BY_USER_TBL,
+                                limit: 100,
+                                scan_index_forward: "false",
+                                key_conditions: {
+                                    "user_id" => {
+                                        attribute_value_list: [id],
+                                        comparison_operator: "EQ"
+                                    },
+                                }
+                            })
+
+    resp.items.each do |vote_entry|
+      REDIS_USER_VOTES.sadd("user-voted:#{uid}", vote_entry["question_id"])
+      response << vote_entry
     end
+    response
   end
 
   def add_friend(friend_id)
     friend = User.find(friend_id)
     friends.push(friend)
     save!
-  end
-
-  def get_votes_history
-    response = Array.new
-    loop do
-      #todo: what if over 100? I don't have query offset yet. Add it soon
-      resp = AWS_DYNAMO.query({
-                                  table_name: AWS_DYNAMO_VOTES_BY_USER_TBL,
-                                  limit: 100,
-                                  scan_index_forward: "false",
-                                  key_conditions: {
-                                      "user_id" => {
-                                          attribute_value_list: [id],
-                                          comparison_operator: "EQ"
-                                      },
-                                  }
-                              })
-      response << resp
-      break if resp.count < 1
-      #todo: REDIS_USER_VOTES.sadd("user-votes:#{uid}", question_id.to_i)
-    end
-    response
   end
 end

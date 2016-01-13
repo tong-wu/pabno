@@ -36,6 +36,7 @@ class Question
     reload
   end
 
+  #todo: Refactor to concerns for anything votes related (votes, yes_no_ratio, yes, no, place_vote)
   def votes
     total_votes = 0
     self.options.each do |vote_val|
@@ -110,7 +111,7 @@ class Question
 
   # Note that these yes/no defs store votes in redis for storage in time intervals.
   # The number stored in redis is the number of NEW yes/no votes to be recorded
-  def vote(user_id, option)
+  def place_vote(user_id, option)
     if REDIS_VOTES.get("VOTES:#{self.id}").nil?
       Resque.enqueue_in(30.seconds, SaveVotes, :question_id => self.id)
     end
@@ -123,6 +124,7 @@ class Question
         REDIS_VOTES.incr("NO:#{self.id}")
     end
 
+    #todo: refactor this into a service
     aws_send_vote(user_id, 1, self.id)
   end
 

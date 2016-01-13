@@ -61,6 +61,9 @@ gem 'aws-sdk', '~> 2'
 #enums for constants
 gem 'enumerize'
 
+# enumerations for constants not in the model
+gem 'enumerate_it', '~> 1.0.3'
+
 #koala for facebook graph api
 gem "koala", "~> 2.2"
 

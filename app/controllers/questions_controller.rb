@@ -29,14 +29,11 @@ class QuestionsController < ApplicationController
   end
 
   def vote
-    if params[:vote] == 'yes'
-      @current_user.cast_vote(@question.id, QuestionOption::YES)
-      render json: { success: @question.yes }, status:200
-    elsif params[:vote] == 'no'
-      @current_user.cast_vote(@question.id, QuestionOption::NO)
-      render json: { success: @question.no }, status:200
+    cast_vote = VoteService.new([QuestionOption::YES, QuestionOption::NO], params[:vote], @question.id, @current_user.id).vote
+    if cast_vote
+      render json: { vote: params[:vote] }, status: 200
     else
-      render json: { success: "Invalid vote option #{params[:vote]}" }, status:400
+      render json: { error: 'Vote was not recorded' }, status: 200
     end
   end
 
